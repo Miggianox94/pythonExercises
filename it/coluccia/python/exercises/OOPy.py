@@ -139,3 +139,68 @@ my_list = [1, 3, 6, 10]
 # same thing can be done using generator expression
 # Output: <generator object <genexpr> at 0x0000000002EBDAF8>
 (x**2 for x in my_list)
+
+# CLOSURES --------------------------------------------------------------------------------
+'''
+We must have a nested function (function inside a function).
+The nested function must refer to a value defined in the enclosing function.
+The enclosing function must return the nested function.
+'''
+def print_msg(msg): # outer enclosing function
+    def printer():  # inner function
+        print(msg)
+    return printer  # this got changed
+
+another = print_msg("Hello") # Output: Hello
+another()  # è come se la chiamassi con "Hello"
+
+
+# DECORATORS -------------------------------------------------------------------------------
+# ne posso mettere anche più di uno
+def smart_divide(func):
+   def inner(a,b):
+      print("I am going to divide",a,"and",b)
+      if b == 0:
+         print("Whoops! cannot divide")
+         return
+
+      return func(a,b)
+   return inner
+
+@smart_divide
+def divide(a,b):
+    return a/b
+
+'''
+In Python, this magic is done as function(*args, **kwargs). In this way, args will be the tuple of positional 
+arguments and kwargs will be the dictionary of keyword arguments.
+'''
+def works_for_all(func):
+    def inner(*args, **kwargs):
+        print("I can decorate any function")
+        return func(*args, **kwargs)
+    return inner
+
+# PROPERTY-------------------------------------------------------------------------------------------
+'''
+In Python, property() is a built-in function that creates and returns a property object. 
+The signature of this function is property(fget=None, fset=None, fdel=None, doc=None)
+'''
+class Celsius:
+    def __init__(self, temperature = 0):
+        self._temperature = temperature
+
+    def to_fahrenheit(self):
+        return (self.temperature * 1.8) + 32
+
+    @property
+    def temperature(self):
+        print("Getting value")
+        return self._temperature
+
+    @temperature.setter
+    def temperature(self, value):
+        if value < -273:
+            raise ValueError("Temperature below -273 is not possible")
+        print("Setting value")
+        self._temperature = value

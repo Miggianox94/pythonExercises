@@ -91,3 +91,116 @@ except:
     raise CustomError
 finally:
    print("Finally block motherfucker")
+
+
+#GLOBAL E LOCAL VARIABLE ----------------------------------------------------------
+x = 5
+
+def foo():
+    x = 10
+    print("local x:", x)
+
+foo()
+print("global x:", x)
+
+'''
+The basic rules for global keyword in Python are:
+
+When we create a variable inside a function, it’s local by default.
+When we define a variable outside of a function, it’s global by default. You don’t have to use global keyword.
+We use global keyword to read and write a global variable inside a function.
+Use of global keyword outside a function has no effect
+'''
+
+
+
+# ACCESSO DB MySql -------------------------------------------------------------------------------------
+import MySQLdb
+
+# Open database connection
+db = MySQLdb.connect("localhost","testuser","test123","TESTDB" )
+
+# prepare a cursor object using cursor() method
+cursor = db.cursor()
+
+# Prepare SQL query to INSERT a record into the database.
+sql = """INSERT INTO EMPLOYEE(FIRST_NAME,
+         LAST_NAME, AGE, SEX, INCOME)
+         VALUES ('Mac', 'Mohan', 20, 'M', 2000)"""
+try:
+   # Execute the SQL command
+   cursor.execute(sql)
+   # Commit your changes in the database
+   db.commit()
+except:
+   # Rollback in case there is any error
+   db.rollback()
+
+
+
+sql = "SELECT * FROM EMPLOYEE \
+       WHERE INCOME > '%d'" % (1000)
+try:
+   # Execute the SQL command
+   cursor.execute(sql)
+   # Fetch all the rows in a list of lists.
+   results = cursor.fetchall()
+   for row in results:
+      fname = row[0]
+      lname = row[1]
+      age = row[2]
+      sex = row[3]
+      income = row[4]
+      # Now print fetched result
+      print "fname=%s,lname=%s,age=%d,sex=%s,income=%d" % \
+             (fname, lname, age, sex, income )
+except:
+   print "Error: unable to fecth data"
+
+# disconnect from server
+db.close()
+
+
+#MULTITHREADING --------------------------------------------------------------------------------------
+import threading
+import time
+
+class myThread (threading.Thread):
+   def __init__(self, threadID, name, counter):
+      threading.Thread.__init__(self)
+      self.threadID = threadID
+      self.name = name
+      self.counter = counter
+   def run(self):
+      print ("Starting " + self.name)
+      # Get lock to synchronize threads
+      threadLock.acquire()
+      print_time(self.name, self.counter, 3)
+      # Free lock to release next thread
+      threadLock.release()
+
+def print_time(threadName, delay, counter):
+   while counter:
+      time.sleep(delay)
+      print ("%s: %s" % (threadName, time.ctime(time.time())))
+      counter -= 1
+
+threadLock = threading.Lock()
+threads = []
+
+# Create new threads
+thread1 = myThread(1, "Thread-1", 1)
+thread2 = myThread(2, "Thread-2", 2)
+
+# Start new Threads
+thread1.start()
+thread2.start()
+
+# Add threads to thread list
+threads.append(thread1)
+threads.append(thread2)
+
+# Wait for all threads to complete
+for t in threads:
+   t.join()
+print ("Exiting Main Thread")
